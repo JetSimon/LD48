@@ -57,11 +57,12 @@ socket.on('cannot join', function(){
 })
 
 socket.on('assign player', function(playerData) {
+    
     prompt.innerHTML = playerData['prompt'];
     time = playerData['time'];
     playerNumber = String(playerData['playerNumber']);
     document.getElementById('youAreMessage').innerHTML = `You Are Player ${playerNumber}`;
-
+    updateVotes(playerData['players'])
     if(playerData['roundOver'])
     {
         stopRound();
@@ -119,6 +120,10 @@ socket.on('player ready', function(playersReady) {
     readyText.innerHTML = playersReady + "/" + playersInGame;
 })
 
+socket.on('update votes', function(pl) {
+    updateVotes(pl);
+})
+
 function startRound()
 {
     players.forEach(player => {
@@ -162,4 +167,13 @@ function stopRound()
 function updateReadyText()
 {
     readyText.innerHTML = "0/" + playersInGame;
+}
+
+function updateVotes(pl)
+{
+    console.log("player data", pl)
+    for (i = 1; i <= 5; i++) 
+    {
+        document.getElementById(String(i)).querySelector("#score").innerHTML = pl[String(i)]['score']
+    }
 }

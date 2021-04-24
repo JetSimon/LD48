@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
         io.sockets.in(roomID).emit('players changed', {'peopleIn':room['peopleIn'], 'playerNumber':false, 'inGame':getInGame(room['players'])});
 
         console.log(rooms[id])
-        socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound']});
+        socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound'],'players':room['players']});
         console.log('user connected to', id);
 
         
@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
         players[String(playerNumber)]['inGame'] = false; 
         console.log('user disconnected');
 
-        io.sockets.in(roomID).emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame(players)});
+        io.sockets.in(roomID).emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame(players), 'players':room['players']});
         
         if(getInGame(room['players']) <= 0)
         {
@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
 
     socket.on('vote', (playerNum) => {
         rooms[roomID]['players'][playerNum]['score']++;
-        console.log(rooms[roomID]['players'])
+        io.sockets.in(roomID).emit('update votes', rooms[roomID]['players']);
     });
 
     socket.on('player ready', (playerNumber) => {     

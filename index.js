@@ -20,7 +20,7 @@ const port = process.env.PORT || 80
 //Rooms need: time, players, prompt
 rooms = {}
 
-const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants", "Zoom Meetings", "Pleasure", "Gamers", "Christmas at Your S/O's Parents", "Moving", "Binge Watching Television", "Drugs", "Yelling Indoors", "Prostate Examinations", "Airplane Food", "Season 33 of The Simpsons", "Cringe Compilations", "Creepy Uncles", "Ludum Dare", "Stoners", "Cheap Beer", "Younger Siblings", "Bad Dates", "Short Kings", "The Buddy System", "Seinfeld", "TikTok", "WWII"];
+const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants", "Zoom Meetings", "Pleasure", "Gamers", "Christmas at Your S/O's Parents", "Moving", "Binge Watching Television", "Drugs", "Yelling Indoors", "Prostate Examinations", "Airplane Food", "Season 33 of The Simpsons", "Cringe Compilations", "Creepy Uncles", "Ludum Dare", "Stoners", "Cheap Beer", "Younger Siblings", "Bad Dates", "Short Kings", "The Buddy System", "Seinfeld", "TikTok", "WWII", "Why Babies Cry", "Why the Earth is Flat", "What the Earth Really Revolves Around", "Why Bad Things Happen to Good People", "Nickleback", "Who's Dad would win in a Fight?", "How to be a great Discord Admin"];
 
 const MAX_TIME = 120;
 const MAX_ROUNDS = 5;

@@ -11,6 +11,7 @@
         <div class="text-center mt-10">
             <p class="text-gray-600 italic text-sm">this round's prompt is...</p>
             <p id="prompt" class="text-4xl">Oranges</p>
+            <p id="timer" class="font-serif text-6xl">120</p>
         </div>
         
         <div class="my-40 justify-items-center mx-auto grid gap-5 grid-cols-2 grid-rows-3 xl:grid-cols-5 xl:grid-rows-1">
@@ -25,7 +26,7 @@
             <p class="my-3 font-bold" id="youAreMessage"></p>
             <p>Enter your Aphorism:</p>
             <form id="form" action="">
-                <input class="outline-black w-1/2 mx-10" id="input" autocomplete="off" /><button class="rounded-lg px-3 py-1 bg-gray-300">Send</button>
+                <input class="outline-black w-1/2 mx-10" id="input" maxlength="130" autocomplete="off" /><button class="rounded-lg px-3 py-1 bg-gray-300">Send</button>
             </form>
         </div>
 
@@ -37,6 +38,8 @@
 
         var form = document.getElementById('form');
         var input = document.getElementById('input');
+        var timer = document.getElementById('timer');
+        var time
         var playerNumber;
 
         form.addEventListener('submit', function(e) {
@@ -55,11 +58,13 @@
             document.body.innerHTML = '<h1> ROOM FULL </h1>';
         })
 
-        socket.on('assign player', function(n) {
-
-            playerNumber = String(n);
+        socket.on('assign player', function(playerData) {
+            time = playerData['time'];
+            playerNumber = String(playerData['number']);
             document.getElementById('youAreMessage').innerHTML = `You Are Player ${playerNumber}`;
         })
+
+        
 
     </script>
   </body>

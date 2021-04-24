@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 
 let peopleIn = 0;
 let prompt = "Oranges";
+timeLeft = 120;
 
 io.on('connection', (socket) => {
     if (peopleIn + 1 > 5){
@@ -25,7 +26,7 @@ io.on('connection', (socket) => {
     const names = ['jim', 'jorts','jetty','Cato'];
     const playerNumber = peopleIn;
     let name = names[Math.floor(Math.random() * names.length)]
-    socket.emit('assign player', playerNumber);
+    socket.emit('assign player', {'playerNumber':playerNumber, 'time':timeLeft});
 
     console.log('user connected');
     console.log(peopleIn);

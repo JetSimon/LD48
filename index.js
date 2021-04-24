@@ -35,10 +35,7 @@ setInterval(function(){
                 io.sockets.in(id).emit('stop round', rooms[id]['time']);
                 rooms[id]['inRound'] = false;
             }
-        }else{
-            if(rooms[id]['inRound']){
-                newRound(id);
-            }
+        
         }
     }
 
@@ -59,7 +56,6 @@ io.on('connection', (socket) => {
         room = rooms[id]
 
         peopleIn = room['peopleIn']
-        players = room['players']
 
         if (peopleIn + 1 > 5 || roomID == null){
             socket.emit('cannot join');
@@ -71,10 +67,10 @@ io.on('connection', (socket) => {
         socket.join(id);
 
         room['peopleIn']++;
-        playerNumber = assignNumber(players);
-        players[String(playerNumber)]['inGame'] = true;
+        playerNumber = assignNumber(room['players']);
+        room['players'][String(playerNumber)]['inGame'] = true;
 
-        io.sockets.in(roomID).emit('players changed', {'peopleIn':room['peopleIn'], 'playerNumber':false, 'inGame':getInGame(players)});
+        io.sockets.in(roomID).emit('players changed', {'peopleIn':room['peopleIn'], 'playerNumber':false, 'inGame':getInGame(room['players'])});
 
         console.log(rooms[id])
         socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound']});
@@ -106,14 +102,13 @@ io.on('connection', (socket) => {
         io.sockets.in(roomID).emit('chat message', msgArr);
     });
 
-    socket.on('player ready', (playerNumber) => { 
-        
-        players = room['players'];       
-        players[playerNumber]['ready'] = true;
-        io.sockets.in(roomID).emit('player ready', getPlayersReady(players));
-        console.log('player is ready ', getPlayersReady(players), ' are ready')
-        if(allPlayersReady(players) && !rooms[roomID]['inRound'])
+    socket.on('player ready', (playerNumber) => {     
+        room['players'][playerNumber]['ready'] = true;
+        io.sockets.in(roomID).emit("player ready", getPlayersReady(room['players']));
+        console.log('player ' + playerNumber + ' is ready ', getPlayersReady(room['players']), ' are ready')
+        if(allPlayersReady(room['players']) && !rooms[roomID]['inRound'])
         {
+            newRound(roomID);
             rooms[roomID]['inRound']=true;
             console.log("emiting start round")
             io.sockets.in(roomID).emit('start round');
@@ -172,9 +167,9 @@ function allPlayersReady(players){
 
 function getPlayersReady(players){
     let amount = 0;
-    for (i = 1; i <= peopleIn; i++) 
+    for (i = 1; i <= 5; i++) 
     {
-        if(players[String(i)]['ready'])
+        if(players[String(i)]['inGame'] && players[String(i)]['ready'])
         {
             amount++
         }

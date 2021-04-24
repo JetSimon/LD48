@@ -20,6 +20,7 @@ var input = document.getElementById('input');
 var timer = document.getElementById('timer');
 var readyText = document.getElementById('readyText');
 var prompt = document.getElementById('prompt');
+var tip = document.getElementById('tip');
 var nextRoundButton = document.getElementById('nextRoundButton');
 var time
 var playerNumber;
@@ -114,6 +115,7 @@ function startRound()
 {
     nextRoundButton.style.visibility = "hidden";
     readyText.style.visibility = "hidden";
+    tip.style.visibility = "visible";
 }
 
 function stopRound()
@@ -122,7 +124,8 @@ function stopRound()
     readyText.style.visibility = "visible";
     updateReadyText();
     nextRoundButton.style.visibility = "visible";
-    
+    prompt.innerHTML = "ALL PLAYERS MUST BE READY"
+    tip.style.visibility = "hidden";
 }
 
 function updateReadyText()

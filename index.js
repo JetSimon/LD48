@@ -7,6 +7,10 @@ const io = new Server(server);
 
 app.use(express.static('public'))
 
+app.get('/play', (req, res) => {
+    res.sendFile('game.html', { root: 'public' });
+});
+
 app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
@@ -207,7 +211,7 @@ function addNewRoom(id)
 {
     rooms[id] = {
         'time':MAX_TIME, 
-        'players':{'1':{'ready':false,'inGame':false}, '2':{'ready':false,'inGame':false}, '3':{'ready':false,'inGame':false}, '4':{'ready':false,'inGame':false}, '5':{'ready':false,'inGame':false}},
+        'players':{'1':{'ready':false,'inGame':false, 'score':0}, '2':{'ready':false,'inGame':false, 'score':0}, '3':{'ready':false,'inGame':false, 'score':0}, '4':{'ready':false,'inGame':false, 'score':0}, '5':{'ready':false,'inGame':false, 'score':0}},
         'prompt':choice(prompts),
         'peopleIn':0,
         'inRound':false

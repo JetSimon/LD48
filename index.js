@@ -15,7 +15,7 @@ let inRound = false;
 
 const port = process.env.PORT || 80
 
-players = {'1':{'ready':false,'o':1}, '2':{'ready':false,'o':2}, '3':{'ready':false,'o':3}, '4':{'ready':false,'o':4}, '5':{'ready':false,'o':5}};
+players = {'1':{'ready':false,'inGame':false}, '2':{'ready':false,'inGame':false}, '3':{'ready':false,'inGame':false}, '4':{'ready':false,'inGame':false}, '5':{'ready':false,'inGame':false}};
 
 let peopleIn = 0;
 let toStart = 0;
@@ -29,6 +29,7 @@ timeLeft = MAX_TIME;
 setInterval(function(){ 
     if(timeLeft > 0){
         timeLeft--;
+        io.emit('time', timeLeft);
         if(timeLeft <= 0){
             console.log("emitting stop round")
             io.emit('stop round');
@@ -50,17 +51,21 @@ io.on('connection', (socket) => {
     }
 
     peopleIn++;
-    io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false});
     const names = ['jim', 'jorts','jetty','Cato'];
-    let playerNumber = peopleIn;
+    let playerNumber = assignNumber();
+    players[String(playerNumber)]['inGame'] = true;
     let name = names[Math.floor(Math.random() * names.length)]
+    io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame()});
     socket.emit('assign player', {'playerNumber':playerNumber, 'time':timeLeft, 'prompt':prompt, 'roundOver':!inRound});
+
 
     console.log('user connected');
     console.log(peopleIn);
 
     socket.on('disconnect', () => {
         peopleIn--;
+        players[String(playerNumber)]['ready'] = false; 
+        players[String(playerNumber)]['inGame'] = false; 
         console.log('user disconnected');
         console.log(peopleIn);
         io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':playerNumber});
@@ -90,6 +95,14 @@ server.listen(port, () => {
 });
 
 function newRound(){
+
+    for (i = 1; i <=5; i++) 
+    {
+        players[String(i)]['ready'] = false
+    }
+
+
+    console.log("NEW ROUND")
     inRound=false;
     timeLeft = MAX_TIME;
     prompt = choice(prompts);
@@ -102,20 +115,23 @@ function choice(choices) {
 }
 
 function allPlayersReady(){
-    for (i = 1; i < peopleIn; i++) 
+
+    let ready = 0
+
+    for (i = 1; i <=5; i++) 
     {
-        if(players[String(i)]['ready'] == false)
+        if(players[String(i)]['ready'] != false)
         {
-            return false
+            ready++;
         }
     }
 
-    return true
+    return ready == peopleIn
 }
 
 function getPlayersReady(){
     let amount = 0;
-    for (i = 1; i < peopleIn; i++) 
+    for (i = 1; i <= peopleIn; i++) 
     {
         if(players[String(i)]['ready'])
         {
@@ -124,4 +140,28 @@ function getPlayersReady(){
     }
 
     return amount;
+}
+
+function assignNumber()
+{
+    for (i = 1; i <= 5; i++) 
+    {
+        if(players[String(i)]['inGame'] == false)
+        {
+            return i;
+        }
+    }
+}
+
+function getInGame()
+{
+    out = []
+    for (i = 1; i <= 5; i++) 
+    {
+        if(players[String(i)]['inGame'])
+        {
+            out.push(String(i))
+        }
+    }
+    return out;
 }

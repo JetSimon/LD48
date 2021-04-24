@@ -43,17 +43,6 @@ socket.on('assign player', function(playerData) {
     time = playerData['time'];
     playerNumber = String(playerData['playerNumber']);
     document.getElementById('youAreMessage').innerHTML = `You Are Player ${playerNumber}`;
-    setInterval(function(){ 
-        if(time > 0){
-            time--;
-            timer.innerHTML = time; 
-        }
-
-        if(time <= 0)
-        {
-            timer.innerHTML = "ROUND OVER";
-        }
-    }, 1000);
 
     if(playerData['roundOver'])
     {
@@ -64,6 +53,18 @@ socket.on('assign player', function(playerData) {
 
 
 })
+socket.on('time', function(timeSent) {
+    time = timeSent
+    if(time > 0){
+        time--;
+        timer.innerHTML = time; 
+    }
+
+    if(time <= 0)
+    {
+        timer.innerHTML = "ROUND OVER";
+    }
+})
 
 socket.on('new prompt', function(data) {
     prompt.innerHTML = data['prompt'];
@@ -72,24 +73,19 @@ socket.on('new prompt', function(data) {
 
 socket.on('players changed', function(data) {
     playerAmount = data['peopleIn']
-    index = data['playerNumber']
-    console.log(index, playerNumber,(Number(index) < Number(playerNumber)))
-    if(index != false && (Number(index) < Number(playerNumber)))
-    {
-        playerNumber--;
-        console.log((playerNumber+1) + " is now " + playerNumber)
-        document.getElementById('youAreMessage').innerHTML = `You Are Player ${playerNumber}`;
-    }
     playersInGame = playerAmount;
     updateReadyText();
+
     for (i = 0; i < players.length; i++) 
     {
         players[i].style.display = "none";
     }
-
-    for (i = 0; i < playerAmount; i++) 
+    console.log("in game")
+    console.log(data['inGame'])
+    for (i = 0; i < data['inGame'].length; i++) 
     {
-        players[i].style.display = "initial";
+        let toChange = data['inGame'][i]
+        players[toChange-1].style.display = "initial"
     }
 })
 
@@ -113,9 +109,9 @@ function startRound()
 
 function stopRound()
 {
-    readyText.style.visibility = "intitial";
+    readyText.style.visibility = "visible";
     updateReadyText();
-    nextRoundButton.style.visibility = "initial";
+    nextRoundButton.style.visibility = "visible";
     
 }
 

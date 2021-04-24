@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
 
         io.sockets.in(roomID).emit('players changed', {'peopleIn':room['peopleIn'], 'playerNumber':false, 'inGame':getInGame(room['players'])});
 
-        socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound'],'players':room['players']});
+        socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound'],'players':room['players'],'round':room['round']});
 
         
     })
@@ -132,7 +132,7 @@ server.listen(port, () => {
 
 function newRound(id){
     rooms[id]['round']++;
-
+    io.sockets.in(id).emit('round++');
     if(rooms[id]['round'] > MAX_ROUNDS)
     {
         io.sockets.in(id).emit('game over', findWinner(rooms[id]['players']));

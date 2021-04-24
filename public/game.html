@@ -7,9 +7,11 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
   </head>
   <body class="bg-gray-200">
+    <a class="pt-3 pl-3 pb-0 text-gray-600 font-serif" href="/">back to menu</a>
     <div id="app" class="">
         
-        <div class="text-center mt-10">
+        <div class="text-center">
+            <p class="text-gray-600 italic text-sm">ROUND <span id="round">1</span></p>
             <p id="tip" class="text-gray-600 italic text-sm">this round's prompt is...</p>
             <p id="prompt" class="text-4xl"></p>
             <p id="timer" class="font-serif text-6xl"></p>
@@ -29,12 +31,12 @@
             
             <form id="form" action="">
               <p>Enter your Aphorism:</p>
-                <input class="outline-black w-1/2 mx-10" id="input" maxlength="130" autocomplete="off" />
+                <textarea class="outline-black w-1/2 mx-10" id="input" maxlength="130" autocomplete="off"></textarea>
                 <button class="mx-10 my-5 hover:bg-gray-400 rounded-lg px-3 py-1 bg-gray-300">Send</button>
             </form>
 
             
-            <button id="nextRoundButton" class="hover:bg-gray-400 rounded-lg px-3 py-1 mt-3 bg-gray-300">Ready for Next Round</button>
+            <button id="nextRoundButton" class="hover:bg-gray-400 text-3xl rounded-lg px-3 py-1 mt-3 bg-gray-300">Ready for Next Round</button>
         </div>
 
     </div>

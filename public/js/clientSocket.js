@@ -56,7 +56,8 @@ socket.on('cannot join', function(){
 })
 
 socket.on('assign player', function(playerData) {
-    
+    let r = document.getElementById('round');
+    r.innerHTML = playerData['round'];
     prompt.innerHTML = playerData['prompt'];
     time = playerData['time'];
     playerNumber = String(playerData['playerNumber']);
@@ -87,6 +88,11 @@ socket.on('time', function(timeSent) {
 socket.on('new prompt', function(data) {
     prompt.innerHTML = data['prompt'];
     time = data['maxTime'];
+})
+
+socket.on('round++', function() {
+    let r = document.getElementById('round');
+    r.innerHTML = Number(r.innerHTML) + 1;
 })
 
 socket.on('players changed', function(data) {

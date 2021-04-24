@@ -20,7 +20,7 @@ const port = process.env.PORT || 80
 //Rooms need: time, players, prompt
 rooms = {}
 
-const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants"];
+const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants", "Zoom Meetings", "Pleasure", "Gamers", "Christmas at Your S/O's Parents", "Moving", "Binge Watching Television", "Drugs"];
 
 const MAX_TIME = 120;
 

@@ -11,6 +11,8 @@ app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
 
+const port = process.env.PORT || 80
+
 let peopleIn = 0;
 
 const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants"];
@@ -57,8 +59,8 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(80, () => {
-    console.log('listening on 80')
+server.listen(port, () => {
+    console.log('listening on ' + port)
 });
 
 function choice(choices) {

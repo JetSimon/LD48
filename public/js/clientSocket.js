@@ -12,7 +12,12 @@ socket.on('connect', function() {
 let players = []
 for (i = 0; i < 5; i++) 
 {
-    players.push(document.getElementById(String(i+1)))
+    let pNum = String(i+1)
+    players.push(document.getElementById(pNum))
+    document.getElementById(pNum).querySelector("#voteButton").addEventListener("click", function(){
+        socket.emit('vote', pNum);
+        document.getElementById(pNum).querySelector("#voteButton").style.visibility = "hidden";
+    })
 }
 
 var form = document.getElementById('form');
@@ -119,6 +124,7 @@ function startRound()
     players.forEach(player => {
         player.querySelector("#poem").style.visibility = "hidden";
         player.querySelector("#poem").innerHTML = "";
+        player.querySelector("#voteButton").style.visibility = "hidden";
     });
 
     
@@ -133,13 +139,16 @@ function startRound()
 
 function stopRound()
 {
+    timer.innerHTML = "ROUND OVER";
     form.style.visibility = "hidden";
     playerUI.style.visibility = "hidden";
     
     players.forEach(player => {
         player.querySelector("#poem").style.visibility = "visible";
+        player.querySelector("#voteButton").style.visibility = "visible";
     });
 
+    document.getElementById(playerNumber).querySelector("#voteButton").style.visibility = "hidden";
     document.getElementById(playerNumber).querySelector("#poem").style.visibility = "visible";
 
     console.log('got stop round')

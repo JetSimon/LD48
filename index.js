@@ -20,7 +20,7 @@ const port = process.env.PORT || 80
 //Rooms need: time, players, prompt
 rooms = {}
 
-const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants", "Zoom Meetings", "Pleasure", "Gamers", "Christmas at Your S/O's Parents", "Moving", "Binge Watching Television", "Drugs"];
+const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants", "Zoom Meetings", "Pleasure", "Gamers", "Christmas at Your S/O's Parents", "Moving", "Binge Watching Television", "Drugs", "Yelling Indoors", "Prostate Examinations", "Airplane Food", "Season 33 of The Simpsons", "Cringe Compilations", "Creepy Uncles", "Ludum Dare", "Stoners", "Cheap Beer", "Younger Siblings", "Bad Dates", "Short Kings", "The Buddy System", "Seinfeld", "TikTok", "WWII"];
 
 const MAX_TIME = 120;
 
@@ -46,6 +46,7 @@ io.on('connection', (socket) => {
     let room;
     let roomID;
     let playerNumber;
+    let playerNames = {"1":"test"}
     socket.on('room', (id) => {
         //If room does not exist then create the room before adding player
         if(!(id in rooms))
@@ -102,6 +103,11 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msgArr) => {
         rooms[roomID]['messagesSentIn']++;
         io.sockets.in(roomID).emit('chat message', msgArr);
+    });
+
+    socket.on('vote', (playerNum) => {
+        rooms[roomID]['players'][playerNum]['score']++;
+        console.log(rooms[roomID]['players'])
     });
 
     socket.on('player ready', (playerNumber) => {     

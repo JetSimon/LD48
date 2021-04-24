@@ -174,7 +174,7 @@ function stopRound()
 
 function updateReadyText()
 {
-    readyText.innerHTML = "0/" + playersInGame;
+    readyText.innerHTML = "0/" + playersInGame + " READY";
 }
 
 function updateVotes(pl)

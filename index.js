@@ -11,81 +11,103 @@ app.get('/', (req, res) => {
     res.sendFile('index.html');
 });
 
-let inRound = false;
-
 const port = process.env.PORT || 80
 
-players = {'1':{'ready':false,'inGame':false}, '2':{'ready':false,'inGame':false}, '3':{'ready':false,'inGame':false}, '4':{'ready':false,'inGame':false}, '5':{'ready':false,'inGame':false}};
-
-let peopleIn = 0;
-let toStart = 0;
+//Rooms need: time, players, prompt
+rooms = {}
 
 const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants"];
-let prompt = choice(prompts);
 
 const MAX_TIME = 120;
-timeLeft = MAX_TIME;
 
 setInterval(function(){ 
-    if(timeLeft > 0){
-        timeLeft--;
-        io.emit('time', timeLeft);
-        if(timeLeft <= 0){
-            console.log("emitting stop round")
-            io.emit('stop round');
-            inRound = false;
-        }
-    }else{
-        if(inRound){
-            newRound();
+    
+    for (const id in rooms) {
+        if(rooms[id]['time'] > 0){
+            rooms[id]['time']--;
+            io.sockets.in(id).emit('time', rooms[id]['time']);
+            if(rooms[id]['time'] <= 0){
+                console.log("emitting stop round")
+                io.sockets.in(id).emit('stop round', rooms[id]['time']);
+                rooms[id]['inRound'] = false;
+            }
+        }else{
+            if(rooms[id]['inRound']){
+                newRound(id);
+            }
         }
     }
+
 }, 1000);
 
 io.on('connection', (socket) => {
-    if (peopleIn + 1 > 5){
-        socket.emit('cannot join');
-        console.log('too many people')
-        socket.disconnect();
-        return;
-    }
+    let room;
+    let roomID;
+    let playerNumber;
+    socket.on('room', (id) => {
+        //If room does not exist then create the room before adding player
+        if(!(id in rooms))
+        {
+            addNewRoom(id);
+        }
 
-    peopleIn++;
-    const names = ['jim', 'jorts','jetty','Cato'];
-    let playerNumber = assignNumber();
-    players[String(playerNumber)]['inGame'] = true;
-    let name = names[Math.floor(Math.random() * names.length)]
-    io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame()});
-    socket.emit('assign player', {'playerNumber':playerNumber, 'time':timeLeft, 'prompt':prompt, 'roundOver':!inRound});
+        roomID = id;
+        room = rooms[id]
 
+        peopleIn = room['peopleIn']
+        players = room['players']
 
-    console.log('user connected');
-    console.log(peopleIn);
+        if (peopleIn + 1 > 5 || roomID == null){
+            socket.emit('cannot join');
+            console.log('too many people')
+            socket.disconnect();
+            return;
+        }
+
+        socket.join(id);
+
+        room['peopleIn']++;
+        playerNumber = assignNumber(players);
+        players[String(playerNumber)]['inGame'] = true;
+
+        io.sockets.in(roomID).emit('players changed', {'peopleIn':room['peopleIn'], 'playerNumber':false, 'inGame':getInGame(players)});
+
+        console.log(rooms[id])
+        socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound']});
+        console.log('user connected to', id);
+
+        
+    })
+
 
     socket.on('disconnect', () => {
-        peopleIn--;
+        if (roomID == null){return}
+        players = room['players'];
+        socket.leave(room);
+        room['peopleIn']--;
         players[String(playerNumber)]['ready'] = false; 
         players[String(playerNumber)]['inGame'] = false; 
         console.log('user disconnected');
-        console.log(peopleIn);
-        io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame()});
+
+        io.sockets.in(roomID).emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame(players)});
         
     });
 
     socket.on('chat message', (msgArr) => {
-        console.log('message: ' + msgArr[0]);
-        io.emit('chat message', msgArr);
+        io.sockets.in(roomID).emit('chat message', msgArr);
     });
 
-    socket.on('player ready', (playerNumber) => {        
+    socket.on('player ready', (playerNumber) => { 
+        
+        players = room['players'];       
         players[playerNumber]['ready'] = true;
-        console.log(players)
-        io.emit('player ready', getPlayersReady());
-        if(allPlayersReady() && !inRound)
+        io.sockets.in(roomID).emit('player ready', getPlayersReady(players));
+        console.log('player is ready ', getPlayersReady(players), ' are ready')
+        if(allPlayersReady(players) && !rooms[roomID]['inRound'])
         {
-            inRound=true;
+            rooms[roomID]['inRound']=true;
             console.log("emiting start round")
-            io.emit('start round');
+            io.sockets.in(roomID).emit('start round');
         }
     });
 });
@@ -94,19 +116,20 @@ server.listen(port, () => {
     console.log('listening on ' + port)
 });
 
-function newRound(){
+function newRound(id){
+
+    players = rooms[id]['players']
 
     for (i = 1; i <=5; i++) 
     {
         players[String(i)]['ready'] = false
     }
 
-
     console.log("NEW ROUND")
-    inRound=false;
-    timeLeft = MAX_TIME;
-    prompt = choice(prompts);
-    io.emit('new prompt', {'prompt':prompt, 'maxTime':MAX_TIME});
+    rooms[id]['inRound']=false;
+    rooms[id]['time'] = MAX_TIME;
+    rooms[id]['prompt'] = choice(prompts);
+    io.sockets.in(id).emit('new prompt', {'prompt':rooms[id]['prompt'], 'maxTime':rooms[id]['time']});
 }
 
 function choice(choices) {
@@ -114,9 +137,18 @@ function choice(choices) {
     return choices[index];
 }
 
-function allPlayersReady(){
+function allPlayersReady(players){
 
     let ready = 0
+    let playersInGame = 0
+
+    for (i = 1; i <= 5; i++) 
+    {
+        if(players[String(i)]['inGame'])
+        {
+            playersInGame++
+        }
+    }
 
     for (i = 1; i <=5; i++) 
     {
@@ -126,10 +158,10 @@ function allPlayersReady(){
         }
     }
 
-    return ready == peopleIn
+    return ready == playersInGame
 }
 
-function getPlayersReady(){
+function getPlayersReady(players){
     let amount = 0;
     for (i = 1; i <= peopleIn; i++) 
     {
@@ -142,7 +174,7 @@ function getPlayersReady(){
     return amount;
 }
 
-function assignNumber()
+function assignNumber(players)
 {
     for (i = 1; i <= 5; i++) 
     {
@@ -153,7 +185,7 @@ function assignNumber()
     }
 }
 
-function getInGame()
+function getInGame(players)
 {
     out = []
     for (i = 1; i <= 5; i++) 
@@ -164,4 +196,15 @@ function getInGame()
         }
     }
     return out;
+}
+
+function addNewRoom(id)
+{
+    rooms[id] = {
+        'time':MAX_TIME, 
+        'players':{'1':{'ready':false,'inGame':false}, '2':{'ready':false,'inGame':false}, '3':{'ready':false,'inGame':false}, '4':{'ready':false,'inGame':false}, '5':{'ready':false,'inGame':false}},
+        'prompt':choice(prompts),
+        'peopleIn':0,
+        'inRound':false
+    }
 }

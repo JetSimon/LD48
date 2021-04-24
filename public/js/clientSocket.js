@@ -1,5 +1,13 @@
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const room = urlParams.get('room')
+console.log("room: ", room)
 
 var socket = io();
+
+socket.on('connect', function() {
+    socket.emit('room', room);
+})
 
 let players = []
 for (i = 0; i < 5; i++) 
@@ -26,6 +34,7 @@ form.addEventListener('submit', function(e) {
 });
 
 nextRoundButton.addEventListener("click", function() {
+    console.log('readying up', playerNumber)
     socket.emit('player ready', playerNumber);
     nextRoundButton.style.visibility = "hidden";
 });
@@ -109,6 +118,7 @@ function startRound()
 
 function stopRound()
 {
+    console.log('got stop round')
     readyText.style.visibility = "visible";
     updateReadyText();
     nextRoundButton.style.visibility = "visible";

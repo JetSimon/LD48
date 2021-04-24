@@ -12,6 +12,7 @@
             <p class="text-gray-600 italic text-sm">this round's prompt is...</p>
             <p id="prompt" class="text-4xl"></p>
             <p id="timer" class="font-serif text-6xl"></p>
+            <p id="readyText" class="font-serif text-3xl"></p>
         </div>
         
         <div class="my-40 justify-items-center mx-auto grid gap-5 grid-cols-2 grid-rows-3 xl:grid-cols-5 xl:grid-rows-1">
@@ -35,82 +36,6 @@
     </div>
     <script src="js/components.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        var socket = io();
-
-        let players = []
-        for (i = 0; i < 5; i++) 
-        {
-            players.push(document.getElementById(String(i+1)))
-        }
-
-        var form = document.getElementById('form');
-        var input = document.getElementById('input');
-        var timer = document.getElementById('timer');
-        var prompt = document.getElementById('prompt');
-        var nextRoundButton = document.getElementById('nextRoundButton');
-        var time
-        var playerNumber;
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (input.value) {
-            socket.emit('chat message', [input.value, playerNumber]);
-            input.value = '';
-            }
-        });
-
-        nextRoundButton.addEventListener("click", function() {
-            socket.emit('player ready', playerNumber);
-        });
-
-        socket.on('chat message', function(msg) {
-            document.getElementById(msg[1]).querySelector("#poem").innerHTML = msg[0];
-        });
-
-        socket.on('cannot join', function(){
-            document.body.innerHTML = '<h1> ROOM FULL </h1>';
-        })
-
-        socket.on('assign player', function(playerData) {
-            prompt.innerHTML = playerData['prompt'];
-            time = playerData['time'];
-            playerNumber = String(playerData['playerNumber']);
-            document.getElementById('youAreMessage').innerHTML = `You Are Player ${playerNumber}`;
-            setInterval(function(){ 
-                if(time > 0){
-                    time--;
-                    timer.innerHTML = time; 
-                }
-
-                if(time <= 0)
-                {
-                        timer.innerHTML = "ROUND OVER";
-                }
-            }, 1000);
-        })
-
-        socket.on('new prompt', function(data) {
-            prompt.innerHTML = data['prompt'];
-            time = data['maxTime'];
-        })
-
-        socket.on('players changed', function(playerAmount) {
-            for (i = 0; i < players.length; i++) 
-            {
-                players[i].style.visibility = "hidden";
-            }
-
-            for (i = 0; i < playerAmount; i++) 
-            {
-                players[i].style.visibility = "initial";
-            }
-        })
-
-        
-
-        
-
-    </script>
+    <script src="js/clientSocket.js"></script>
   </body>
 </html>

@@ -15,7 +15,7 @@ let inRound = false;
 
 const port = process.env.PORT || 80
 
-players = {'1':{'ready':false}, '2':{'ready':false}, '3':{'ready':false}, '4':{'ready':false}, '5':{'ready':false}};
+players = {'1':{'ready':false,'o':1}, '2':{'ready':false,'o':2}, '3':{'ready':false,'o':3}, '4':{'ready':false,'o':4}, '5':{'ready':false,'o':5}};
 
 let peopleIn = 0;
 let toStart = 0;
@@ -23,13 +23,14 @@ let toStart = 0;
 const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants"];
 let prompt = choice(prompts);
 
-const MAX_TIME = 10;
+const MAX_TIME = 120;
 timeLeft = MAX_TIME;
 
 setInterval(function(){ 
     if(timeLeft > 0){
         timeLeft--;
-        if(timeLeft == 0){
+        if(timeLeft <= 0){
+            console.log("emitting stop round")
             io.emit('stop round');
             inRound = false;
         }
@@ -49,11 +50,11 @@ io.on('connection', (socket) => {
     }
 
     peopleIn++;
-    io.emit('players changed', peopleIn);
+    io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false});
     const names = ['jim', 'jorts','jetty','Cato'];
-    const playerNumber = peopleIn;
+    let playerNumber = peopleIn;
     let name = names[Math.floor(Math.random() * names.length)]
-    socket.emit('assign player', {'playerNumber':playerNumber, 'time':timeLeft, 'prompt':prompt});
+    socket.emit('assign player', {'playerNumber':playerNumber, 'time':timeLeft, 'prompt':prompt, 'roundOver':!inRound});
 
     console.log('user connected');
     console.log(peopleIn);
@@ -62,7 +63,8 @@ io.on('connection', (socket) => {
         peopleIn--;
         console.log('user disconnected');
         console.log(peopleIn);
-        io.emit('players changed', peopleIn);
+        io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':playerNumber});
+        
     });
 
     socket.on('chat message', (msgArr) => {
@@ -70,12 +72,14 @@ io.on('connection', (socket) => {
         io.emit('chat message', msgArr);
     });
 
-    socket.on('player ready', (playerNumber) => {
-        console.log(players)
+    socket.on('player ready', (playerNumber) => {        
         players[playerNumber]['ready'] = true;
+        console.log(players)
+        io.emit('player ready', getPlayersReady());
         if(allPlayersReady() && !inRound)
         {
             inRound=true;
+            console.log("emiting start round")
             io.emit('start round');
         }
     });
@@ -107,4 +111,17 @@ function allPlayersReady(){
     }
 
     return true
+}
+
+function getPlayersReady(){
+    let amount = 0;
+    for (i = 1; i < peopleIn; i++) 
+    {
+        if(players[String(i)]['ready'])
+        {
+            amount++
+        }
+    }
+
+    return amount;
 }

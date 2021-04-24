@@ -47,6 +47,9 @@
     <p class="mb-5 text-center mx-auto text-sm text-gray-300 font-serif">made by jet simon for Ludum Dare 48 | <a class="text-gray-400" href="http://www.jetsimon.com/">jetsimon.com</a> | <a class="text-blue-400" href="https://twitter.com/SimonJet">@SimonJet</a></p>
     <script>
 
+        window.onload = function(){let id = makeid(16)
+            document.getElementById("gameLink").value=id;};
+
         document.getElementById("generateButton").addEventListener("click", function() {
             let id = makeid(16)
             document.getElementById("gameLink").value=id;

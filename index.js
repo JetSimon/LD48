@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
         players[String(playerNumber)]['inGame'] = false; 
         console.log('user disconnected');
         console.log(peopleIn);
-        io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':playerNumber});
+        io.emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame()});
         
     });
 

@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
         if(getInGame(room['players']) <= 0)
         {
             console.log('destroying room ', roomID);
-            delete rooms['roomID'];
+            delete rooms[roomID];
         }
     });
 

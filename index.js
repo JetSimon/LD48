@@ -74,9 +74,7 @@ io.on('connection', (socket) => {
 
         io.sockets.in(roomID).emit('players changed', {'peopleIn':room['peopleIn'], 'playerNumber':false, 'inGame':getInGame(room['players'])});
 
-        console.log(rooms[id])
         socket.emit('assign player', {'playerNumber':playerNumber, 'time':rooms[id]['time'], 'prompt':rooms[id]['prompt'], 'roundOver':!rooms[id]['inRound'],'players':room['players']});
-        console.log('user connected to', id);
 
         
     })

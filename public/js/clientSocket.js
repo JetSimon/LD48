@@ -1,7 +1,6 @@
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const room = urlParams.get('room')
-console.log("room: ", room)
 
 var socket = io();
 
@@ -43,7 +42,6 @@ form.addEventListener('submit', function(e) {
 });
 
 nextRoundButton.addEventListener("click", function() {
-    console.log('readying up', playerNumber)
     socket.emit('player ready', playerNumber);
     nextRoundButton.style.visibility = "hidden";
 });
@@ -99,8 +97,7 @@ socket.on('players changed', function(data) {
     {
         players[i].style.display = "none";
     }
-    console.log("in game")
-    console.log(data['inGame'])
+    
     for (i = 0; i < data['inGame'].length; i++) 
     {
         let toChange = data['inGame'][i]
@@ -156,7 +153,6 @@ function stopRound()
     document.getElementById(playerNumber).querySelector("#voteButton").style.visibility = "hidden";
     document.getElementById(playerNumber).querySelector("#poem").style.visibility = "visible";
 
-    console.log('got stop round')
     readyText.style.visibility = "visible";
     updateReadyText();
     nextRoundButton.style.visibility = "visible";
@@ -171,7 +167,6 @@ function updateReadyText()
 
 function updateVotes(pl)
 {
-    console.log("player data", pl)
     for (i = 1; i <= 5; i++) 
     {
         document.getElementById(String(i)).querySelector("#score").innerHTML = pl[String(i)]['score']

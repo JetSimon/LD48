@@ -23,11 +23,11 @@ rooms = {}
 const prompts = ["Oranges", "Money", "Twitch Streaming", "Parents", "School", "Pooping Your Pants", "Zoom Meetings", "Pleasure", "Gamers", "Christmas at Your S/O's Parents", "Moving", "Binge Watching Television", "Drugs", "Yelling Indoors", "Prostate Examinations", "Airplane Food", "Season 33 of The Simpsons", "Cringe Compilations", "Creepy Uncles", "Ludum Dare", "Stoners", "Cheap Beer", "Younger Siblings", "Bad Dates", "Short Kings", "The Buddy System", "Seinfeld", "TikTok", "WWII"];
 
 const MAX_TIME = 120;
+const MAX_ROUNDS = 5;
 
 setInterval(function(){ 
-    
     for (const id in rooms) {
-        //console.log(rooms[id]['messagesSentIn'], getInGame(rooms[id]['players']).length)
+        
         if(rooms[id]['time'] > 0 && rooms[id]['inRound']){
             rooms[id]['time']--;
             io.sockets.in(id).emit('time', rooms[id]['time']);
@@ -115,6 +115,10 @@ io.on('connection', (socket) => {
         if(allPlayersReady(room['players']) && !rooms[roomID]['inRound'])
         {
             newRound(roomID);
+            if(!(roomID in rooms))
+            {
+                return
+            }
             rooms[roomID]['inRound']=true;
             console.log("emiting start round")
             io.sockets.in(roomID).emit('start round');
@@ -127,6 +131,15 @@ server.listen(port, () => {
 });
 
 function newRound(id){
+    rooms[id]['round']++;
+
+    if(rooms[id]['round'] > MAX_ROUNDS)
+    {
+        io.sockets.in(id).emit('game over', findWinner(rooms[id]['players']));
+        delete rooms[id];
+        return;
+    }
+
     rooms[id]['messagesSentIn']=0;
     players = rooms[id]['players']
 
@@ -216,6 +229,29 @@ function addNewRoom(id)
         'prompt':choice(prompts),
         'peopleIn':0,
         'inRound':false,
-        'messagesSentIn':0
+        'messagesSentIn':0,
+        'round':0
+    }
+}
+
+function findWinner(players)
+{
+    console.log("game over")
+    let biggestScore = 0;
+    for (i = 1; i <= 5; i++) 
+    {
+        if(players[String(i)]['inGame'])
+        {
+            biggestScore = players[String(i)]['score'] > biggestScore ? players[String(i)]['score'] : biggestScore;
+        }
+    }
+
+
+    for (i = 1; i <= 5; i++) 
+    {
+        if(players[String(i)]['inGame'] && players[String(i)]['score'] == biggestScore)
+        {
+            return String(i);
+        }
     }
 }

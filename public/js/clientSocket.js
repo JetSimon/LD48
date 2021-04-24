@@ -51,7 +51,7 @@ socket.on('chat message', function(msg) {
 });
 
 socket.on('cannot join', function(){
-    document.body.innerHTML = '<h1> ROOM FULL </h1>';
+    document.body.innerHTML = '<div class="text-center justify-items-center h-screen pt-20 m-auto"><h1 class="text-5xl font-serif">ROOM FULL</h1></div>';
 })
 
 socket.on('assign player', function(playerData) {
@@ -119,6 +119,11 @@ socket.on('player ready', function(playersReady) {
 
 socket.on('update votes', function(pl) {
     updateVotes(pl);
+})
+
+socket.on('game over', function(pl) {
+    document.body.innerHTML = '<div class="text-center justify-items-center h-screen pt-20 m-auto"><h1 class="text-5xl font-serif"> GAME OVER - PLAYER ' + pl + ' WINS!</h1></div>';
+    socket.disconnect()
 })
 
 function startRound()

@@ -27,10 +27,11 @@ const MAX_TIME = 120;
 setInterval(function(){ 
     
     for (const id in rooms) {
+        //console.log(rooms[id]['messagesSentIn'], getInGame(rooms[id]['players']).length)
         if(rooms[id]['time'] > 0 && rooms[id]['inRound']){
             rooms[id]['time']--;
             io.sockets.in(id).emit('time', rooms[id]['time']);
-            if(rooms[id]['time'] <= 0){
+            if(rooms[id]['time'] <= 0 || rooms[id]['messagesSentIn'] >= getInGame(rooms[id]['players']).length ){
                 console.log("emitting stop round")
                 io.sockets.in(id).emit('stop round', rooms[id]['time']);
                 rooms[id]['inRound'] = false;
@@ -99,6 +100,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat message', (msgArr) => {
+        rooms[roomID]['messagesSentIn']++;
         io.sockets.in(roomID).emit('chat message', msgArr);
     });
 
@@ -121,7 +123,7 @@ server.listen(port, () => {
 });
 
 function newRound(id){
-
+    rooms[id]['messagesSentIn']=0;
     players = rooms[id]['players']
 
     for (i = 1; i <=5; i++) 
@@ -199,7 +201,7 @@ function getInGame(players)
             out.push(String(i))
         }
     }
-    return out;
+    return (out);
 }
 
 function addNewRoom(id)
@@ -209,6 +211,7 @@ function addNewRoom(id)
         'players':{'1':{'ready':false,'inGame':false, 'score':0}, '2':{'ready':false,'inGame':false, 'score':0}, '3':{'ready':false,'inGame':false, 'score':0}, '4':{'ready':false,'inGame':false, 'score':0}, '5':{'ready':false,'inGame':false, 'score':0}},
         'prompt':choice(prompts),
         'peopleIn':0,
-        'inRound':false
+        'inRound':false,
+        'messagesSentIn':0
     }
 }

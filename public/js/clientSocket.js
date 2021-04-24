@@ -17,6 +17,7 @@ for (i = 0; i < 5; i++)
 
 var form = document.getElementById('form');
 var input = document.getElementById('input');
+var playerUI = document.getElementById('playerInput');
 var timer = document.getElementById('timer');
 var readyText = document.getElementById('readyText');
 var prompt = document.getElementById('prompt');
@@ -30,7 +31,9 @@ form.addEventListener('submit', function(e) {
     e.preventDefault();
     if (input.value) {
     socket.emit('chat message', [input.value, playerNumber]);
+    playerUI.style.visibility = "hidden";
     input.value = '';
+    form.style.visibility = "hidden";
     }
 });
 
@@ -113,6 +116,16 @@ socket.on('player ready', function(playersReady) {
 
 function startRound()
 {
+    players.forEach(player => {
+        player.querySelector("#poem").style.visibility = "hidden";
+        player.querySelector("#poem").innerHTML = "";
+    });
+
+    
+    document.getElementById(playerNumber).querySelector("#poem").style.visibility = "visible";
+    
+    form.style.visibility = "visible";
+    playerUI.style.visibility = "visible";
     nextRoundButton.style.visibility = "hidden";
     readyText.style.visibility = "hidden";
     tip.style.visibility = "visible";
@@ -120,6 +133,15 @@ function startRound()
 
 function stopRound()
 {
+    form.style.visibility = "hidden";
+    playerUI.style.visibility = "hidden";
+    
+    players.forEach(player => {
+        player.querySelector("#poem").style.visibility = "visible";
+    });
+
+    document.getElementById(playerNumber).querySelector("#poem").style.visibility = "visible";
+
     console.log('got stop round')
     readyText.style.visibility = "visible";
     updateReadyText();

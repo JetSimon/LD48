@@ -91,6 +91,11 @@ io.on('connection', (socket) => {
 
         io.sockets.in(roomID).emit('players changed', {'peopleIn':peopleIn, 'playerNumber':false, 'inGame':getInGame(players)});
         
+        if(getInGame(room['players']) <= 0)
+        {
+            console.log('destroying room ', roomID);
+            delete rooms['roomID'];
+        }
     });
 
     socket.on('chat message', (msgArr) => {

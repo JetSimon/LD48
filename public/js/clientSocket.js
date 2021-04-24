@@ -17,6 +17,7 @@ for (i = 0; i < 5; i++)
         socket.emit('vote', pNum);
         document.getElementById(pNum).querySelector("#voteButton").style.visibility = "hidden";
     })
+    document.getElementById(pNum).querySelector("#voteButton").style.visibility = "hidden";
 }
 
 var form = document.getElementById('form');

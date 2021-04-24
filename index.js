@@ -27,7 +27,7 @@ const MAX_TIME = 120;
 setInterval(function(){ 
     
     for (const id in rooms) {
-        if(rooms[id]['time'] > 0){
+        if(rooms[id]['time'] > 0 && rooms[id]['inRound']){
             rooms[id]['time']--;
             io.sockets.in(id).emit('time', rooms[id]['time']);
             if(rooms[id]['time'] <= 0){

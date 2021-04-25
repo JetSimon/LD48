@@ -10,15 +10,15 @@
     <a class="pt-3 pl-3 pb-0 text-gray-600 font-serif" href="/">back to menu</a>
     <div id="app" class="">
         
-        <div class="text-center">
+        <div class="grid justify-items-center text-center">
             <p class="text-gray-600 italic text-sm">ROUND <span id="round">1</span></p>
             <p id="tip" class="text-gray-600 italic text-sm">this round's prompt is...</p>
-            <p id="prompt" class="text-4xl"></p>
+            <p id="prompt" class="w-1/3 mb-3 rounded-lg bg-white text-4xl"></p>
             <p id="timer" class="font-serif text-6xl"></p>
             <p id="readyText" class="font-serif text-3xl"></p>
         </div>
         
-        <div class="mt-20 justify-items-center mx-auto grid gap-5 grid-cols-3 grid-auto">
+        <div class="mt-20 justify-items-center mx-auto grid gap-5 grid-cols-1 md:grid-cols-3 grid-auto">
             <player-box id="1" color="text-red-400" name="Player 1"></player-box>
             <player-box id="2" color="text-blue-400" name="Player 2"></player-box>
             <player-box id="3" color="text-green-400" name="Player 3"></player-box>

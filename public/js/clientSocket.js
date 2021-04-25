@@ -15,7 +15,10 @@ for (i = 0; i < 5; i++)
     players.push(document.getElementById(pNum))
     document.getElementById(pNum).querySelector("#voteButton").addEventListener("click", function(){
         socket.emit('vote', pNum);
-        document.getElementById(pNum).querySelector("#voteButton").style.visibility = "hidden";
+        players.forEach(player => {
+            player.querySelector("#voteButton").style.visibility = "hidden";
+        });
+
     })
     document.getElementById(pNum).querySelector("#voteButton").style.visibility = "hidden";
 }

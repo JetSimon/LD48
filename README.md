@@ -1,4 +1,4 @@
-# LD48
+# aphorism.io - game made for LD48
 jackbox-style party game for ld48. express, node, tailwind, vue, socket.io, sweat, tears.
 
 http://aphorism.io/
